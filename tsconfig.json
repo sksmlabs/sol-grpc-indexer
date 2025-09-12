@@ -1,47 +1,40 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
-    // File Layout
-    // "rootDir": "./src",
-    // "outDir": "./dist",
+    /* ---------- File Layout ---------- */
+    "rootDir": "./src",             // where your source TypeScript files live
+    "outDir": "./dist",             // where compiled JavaScript should go
 
-    // Environment Settings
-    // See also https://aka.ms/tsconfig/module
-    "module": "esnext",
-    "moduleResolution": "node",
-    "target": "ES2020",
-    "types": [],
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    // For nodejs:
-    // "lib": ["esnext"],
-    // "types": ["node"],
-    // and npm install -D @types/node
+    /* ---------- Module System ---------- */
+    "module": "commonjs",           // use CommonJS (no .js extension required in imports)
+    "moduleResolution": "node",     // standard Node module resolution
+    "target": "ES2020",             // modern JS features, but still widely supported
+    "lib": ["es2020"],              // include ES2020 library features
+    "types": ["node"],              // load Node.js type definitions (process, fs, etc.)
 
-    // Other Outputs
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
+    /* ---------- Interop ---------- */
+    "esModuleInterop": true,        // allows default imports from CommonJS modules
+    "allowSyntheticDefaultImports": true, // lets you import CJS as if it had a default export
 
-    // Stricter Typechecking Options
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    /* ---------- Outputs ---------- */
+    "sourceMap": true,              // generate .map files for debugging
+    "declaration": true,            // generate .d.ts type declaration files
+    "declarationMap": true,         // source maps for the declaration files
 
-    // Style Options
-    // "noImplicitReturns": true,
-    // "noImplicitOverride": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "noFallthroughCasesInSwitch": true,
-    // "noPropertyAccessFromIndexSignature": true,
+    /* ---------- Strictness ---------- */
+    "strict": true,                 // enable all strict type-checking options
+    "noUncheckedIndexedAccess": true,   // adds undefined to out-of-bounds indexed access
+    "exactOptionalPropertyTypes": true, // differentiate between `{ a?: string }` and `{ a: string | undefined }`
 
-    // Recommended Options
-    "strict": true,
-    "jsx": "react-jsx",
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true,
-  }
+    /* ---------- Style / Safety (optional stricter checks) ---------- */
+    // "noImplicitReturns": true,        // error if a function doesn't explicitly return in all paths
+    // "noImplicitOverride": true,       // require `override` keyword when overriding a method
+    // "noUnusedLocals": true,           // error on declared but unused local variables
+    // "noUnusedParameters": true,       // error on unused function parameters
+    // "noFallthroughCasesInSwitch": true, // error on switch cases that fall through
+
+    /* ---------- Performance ---------- */
+    "skipLibCheck": true             // skip type-checking d.ts files for faster builds
+  },
+  "include": ["src"],                // compile everything in src/
+  "exclude": ["node_modules", "dist"] // ignore dependencies and build output
 }
