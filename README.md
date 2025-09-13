@@ -48,17 +48,6 @@ GRPC_TOKEN=your_grpc_token_if_required
 
 ## Usage
 
-### Development Mode
-```bash
-npm run dev
-```
-
-### Build and Run
-```bash
-npm run build
-npm start
-```
-
 ### Available Commands
 
 - **Slot Updates**: Stream slot information
@@ -76,22 +65,6 @@ npm run dev ping
 npm run dev token usdt  # Monitor USDT
 npm run dev token usdc  # Monitor USDC
 npm run dev token wsol  # Monitor Wrapped SOL
-```
-
-## Project Structure
-
-```
-src/
-├── config/          # Configuration management
-├── constants/       # Application constants (token mints, etc.)
-├── grpc/           # gRPC client and subscription management
-│   ├── client.ts   # Main gRPC client implementation
-│   ├── createSubReqs.ts  # Subscription request builders
-│   └── sendSubReqs.ts    # Subscription sending logic
-├── processing/     # Data processing and transformation
-│   └── index.ts    # Transaction and account processing
-├── types/          # TypeScript type definitions
-└── index.ts        # Main application entry point
 ```
 
 ## Configuration
@@ -124,27 +97,21 @@ The indexer processes various types of Solana data:
 - Graceful handling of malformed data
 - Detailed error logging for debugging
 
-## Development
+## Project Structure
 
-### Scripts
-- `npm run dev`: Start development server with hot reload
-- `npm run build`: Compile TypeScript to JavaScript
-- `npm run start`: Run compiled application
-- `npm run clean`: Clean build directory
-
-### TypeScript Configuration
-- Strict type checking enabled
-- Modern ES2020 target
-- Source maps for debugging
-- Declaration files generation
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+```
+src/
+├── config/          # Configuration management
+├── constants/       # Application constants (token mints, etc.)
+├── grpc/           # gRPC client and subscription management
+│   ├── client.ts   # Main gRPC client implementation
+│   ├── createSubReqs.ts  # Subscription request builders
+│   └── sendSubReqs.ts    # Subscription sending logic
+├── processing/     # Data processing and transformation
+│   └── index.ts    # Transaction and account processing
+├── types/          # TypeScript type definitions
+└── index.ts        # Main application entry point
+```
 
 ## License
 
