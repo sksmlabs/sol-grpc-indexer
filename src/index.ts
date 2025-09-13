@@ -4,7 +4,7 @@ import {
   createSlotSubscription,
   createPingSubscription,
   createTokenSubscription,
-} from "./grpc/createSubReqs";
+} from "./grpc/subReqs";
 
 async function main(): Promise<void> {
   const [type, token] = [process.argv[2]?.toLowerCase() || "slot", process.argv[3]?.toLowerCase()];
