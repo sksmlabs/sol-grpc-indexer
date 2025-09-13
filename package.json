@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.13.4",
-    "@triton-one/yellowstone-grpc": "^4.0.2"
+    "@triton-one/yellowstone-grpc": "^4.0.2",
+    "bs58": "^6.0.0"
   }
 }

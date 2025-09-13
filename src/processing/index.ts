@@ -1,21 +1,46 @@
 import { SubscribeUpdate, SubscribeUpdateTransactionInfo } from "@triton-one/yellowstone-grpc";
+import * as bs58 from 'bs58';
 
 export class ProcessData {
-    async processTransaction(data: SubscribeUpdate) {
-        console.log(data);
-        if (!data.transaction?.transaction) return;
-        const transaction: SubscribeUpdateTransactionInfo = data.transaction?.transaction;
-        const slot = BigInt(data?.transaction.slot);
-        
 
-        if (!transaction) {
-            console.error('Transaction is undefined');
-            return;
-        }
-        const signature = (transaction as any).signature;
+    private processBuffers(obj: any): any {
+        if (!obj) return obj;
         
-        // const blockTime = transaction.blockTime ? new Date(transaction.blockTime * 1000) : null;
-        // console.log(slot);
+        if (Buffer.isBuffer(obj) || obj instanceof Uint8Array) {
+          return bs58.default.encode(obj);
+        }
+        
+        if (Array.isArray(obj)) {
+          return obj.map(item => this.processBuffers(item));
+        }
+        
+        if (typeof obj === 'object') {
+          return Object.fromEntries(
+            Object.entries(obj).map(([k, v]) => [k, this.processBuffers(v)])
+          );
+        }
+        
+        return obj;
+    }
+
+    async processTransaction(data: SubscribeUpdate) {
+
+        // Convert buffers to readable format
+        const processedData = this.processBuffers(data);
+
+        if (!data.transaction?.transaction) return;
+        const txnInfo: SubscribeUpdateTransactionInfo = processedData.transaction?.transaction;
+        const slot = BigInt(processedData?.transaction.slot);
+        const signature = (txnInfo as any).signature;
+        const success = !txnInfo?.meta?.err;
+        const fee = txnInfo.meta?.fee ? BigInt(txnInfo.meta?.fee) : null;
+        // const blockTime = txnInfo.blockTime
+
+        const accounts = txnInfo.transaction?.message?.accountKeys || [];
+        const recentBlockhash = txnInfo.transaction?.message?.recentBlockhash;
+
+        console.log(slot, signature, success, fee, accounts, recentBlockhash);
+        
 
     }
 
