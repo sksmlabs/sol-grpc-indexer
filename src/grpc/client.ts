@@ -131,7 +131,7 @@ export class YellowStoneClient {
           }
     
           if (data.slot) {
-            console.log(data);
+            this.processor.processSlot(data);
           }
     
           if (data.block) {

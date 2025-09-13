@@ -105,8 +105,7 @@ src/
 ├── constants/       # Application constants (token mints, etc.)
 ├── grpc/           # gRPC client and subscription management
 │   ├── client.ts   # Main gRPC client implementation
-│   ├── createSubReqs.ts  # Subscription request builders
-│   └── sendSubReqs.ts    # Subscription sending logic
+│   ├── subReqs.ts  # Subscription request builders
 ├── processing/     # Data processing and transformation
 │   └── index.ts    # Transaction and account processing
 ├── types/          # TypeScript type definitions

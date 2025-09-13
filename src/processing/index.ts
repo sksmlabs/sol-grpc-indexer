@@ -1,5 +1,6 @@
 import { SubscribeUpdate, SubscribeUpdateTransactionInfo } from "@triton-one/yellowstone-grpc";
 import * as bs58 from 'bs58';
+import { db } from "../db";
 
 export class ProcessData {
 
@@ -41,6 +42,16 @@ export class ProcessData {
 
         console.log(slot, signature, success, fee, accounts, recentBlockhash);
         
+        await db.client.transaction.create(
+          {
+            data: {
+              signature: signature,
+              slot,
+              success,
+              fee,
+            }
+          }
+        )
 
     }
 
@@ -52,5 +63,26 @@ export class ProcessData {
           } catch (error) {
             console.error("Error processing account", error);
           }
+    }
+
+    async processSlot(data: SubscribeUpdate) {
+      try {
+        if (!data.slot) return; // exit early if undefined
+        const { slot, parent } = data?.slot;
+
+        await db.client.slotUpdate.upsert({
+          where: { slot },
+          update: {
+            parent: parent ?? null
+          },
+          create: {
+            slot,
+            parent: parent ?? null
+          }
+        })
+      } catch (error) {
+        console.error("Error processing account", error);
+      }
+      
     }
 }
