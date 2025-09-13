@@ -36,13 +36,22 @@ export function createTokenSubscription(tokenMints: string[]): SubscribeRequest 
     return {
         slots: {},
         accounts: {
-            accountSubscribe: {
+            'token-accounts': {
                 account: tokenMints,
                 owner: [],
-                filters: []
-              }
+                filters: [],
+            },
         },
-        transactions: {},
+        transactions: {
+            'token-transfers': {
+                vote: false,
+                failed: false,
+                signature: undefined,
+                accountInclude: [],
+                accountExclude: [],
+                accountRequired: [],
+            },
+        },
         blocks: {},
         blocksMeta: {},
         entry: {},

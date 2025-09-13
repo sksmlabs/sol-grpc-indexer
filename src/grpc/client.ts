@@ -1,6 +1,7 @@
 import Client, { SubscribeRequest, SubscribeUpdate } from "@triton-one/yellowstone-grpc";
 import { GRPC_ENDPOINT } from "../config";
 import { Millis } from "../types";
+import { ProcessData } from "../processing";
 
 export enum ClientState {
   Idle = "idle",
@@ -18,6 +19,8 @@ export class YellowStoneClient {
     private readonly reconnectDelay: Millis = 1000; // 1 second
     private maxAttempts: number = 5;
     private state: ClientState = ClientState.Idle;
+
+    private processor = new ProcessData();
 
     constructor(
         private endpoint: string | undefined = GRPC_ENDPOINT,
@@ -120,11 +123,11 @@ export class YellowStoneClient {
     private async handleData(data: SubscribeUpdate): Promise<void> {
         try {
           if (data.transaction) {
-            console.log(data);
+            this.processor.processTransaction(data);
           }
     
           if (data.account) {
-            console.log(data);
+            this.processor.processAccount(data);
           }
     
           if (data.slot) {
