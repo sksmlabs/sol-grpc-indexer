@@ -4,14 +4,23 @@ import {
   createSlotSubscription,
   createPingSubscription,
   createTokenSubscription,
+  createSolTransferSubscription,
 } from "./grpc/subReqs";
+import { processHighValueTransaction } from "./processing/proHighValTxn";
+
 
 async function main(): Promise<void> {
+  const client = new YellowStoneClient();
+
   const [type, token] = [process.argv[2]?.toLowerCase() || "slot", process.argv[3]?.toLowerCase()];
 
   const subs: Record<string, () => any> = {
     slot: createSlotSubscription,
     ping: createPingSubscription,
+    sol: () => {
+      client.setOnData(processHighValueTransaction);
+      return createSolTransferSubscription();
+    },
     token: () => {
       const tokenMap: Record<string, string> = { usdt: USDT_MINT, usdc: USDC_MINT, wsol: WSOL_MINT };
       const mint = tokenMap[token!];
@@ -29,7 +38,6 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const client = new YellowStoneClient();
   client.getVersion();
   await client.connect(factory());
 }

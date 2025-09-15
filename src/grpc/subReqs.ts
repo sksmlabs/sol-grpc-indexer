@@ -1,4 +1,4 @@
-import { SubscribeRequest } from "@triton-one/yellowstone-grpc";
+import { CommitmentLevel, SubscribeRequest } from "@triton-one/yellowstone-grpc";
 
 export function createSlotSubscription(): SubscribeRequest {
     return {
@@ -58,6 +58,29 @@ export function createTokenSubscription(tokenMints: string[]): SubscribeRequest 
         accountsDataSlice: [],
         transactionsStatus: {},
         commitment: undefined,
+        ping: undefined,
+    };
+}
+
+export function createSolTransferSubscription(): SubscribeRequest {
+    return {
+        slots: {},
+        accounts: {},
+        transactions: {
+          client: {
+            accountInclude: ["11111111111111111111111111111111"], // System Program
+            accountExclude: [],
+            accountRequired: [],
+            vote: false,
+            failed: false,
+          }
+        },
+        blocks: {},
+        blocksMeta: {},
+        entry: {},
+        accountsDataSlice: [],
+        transactionsStatus: {},
+        commitment: CommitmentLevel.CONFIRMED,
         ping: undefined,
     };
 }

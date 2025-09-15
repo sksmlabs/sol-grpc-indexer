@@ -11,6 +11,8 @@ export enum ClientState {
   Closed = "closed",
 }
 
+const processor = new ProcessData();
+
 export class YellowStoneClient {
     private client: Client;
     private stream: any;
@@ -20,11 +22,11 @@ export class YellowStoneClient {
     private maxAttempts: number = 5;
     private state: ClientState = ClientState.Idle;
 
-    private processor = new ProcessData();
+    
 
     constructor(
         private endpoint: string | undefined = GRPC_ENDPOINT,
-        private onData?: (data: any) => void,
+        private onData: (data: any) => void = processor.processData.bind(processor),
         private onError?: (error: any) => void
     ) {
         if (!this.endpoint) {
@@ -37,6 +39,10 @@ export class YellowStoneClient {
     public async getVersion() {
         const version = await this.client.getVersion(); // gets the version information
         console.log(version);
+    }
+
+    public setOnData(onDataCallback?: (data: any) => void) {
+      this.onData = onDataCallback ?? processor.processData.bind(processor);
     }
 
     public get connectionState(): ClientState {
@@ -122,28 +128,13 @@ export class YellowStoneClient {
 
     private async handleData(data: SubscribeUpdate): Promise<void> {
         try {
-          if (data.transaction) {
-            this.processor.processTransaction(data);
-          }
-    
-          if (data.account) {
-            this.processor.processAccount(data);
-          }
-    
-          if (data.slot) {
-            this.processor.processSlot(data);
-          }
-    
-          if (data.block) {
-            console.log(`Block update: ${data.block.blockhash}`, {
-              slot: data.block.slot,
-              blockHeight: data.block.blockHeight,
-            });
-          }
+          // Convert buffers to readable format
+          const processedData = processor.processBuffers(data);
+          this.onData(processedData);
         } catch (error) {
           console.error('Error processing update', error);
         }
-      }
+    }
 
     private handleStreamError(error: any): void {
         console.error("Stream error:", error);

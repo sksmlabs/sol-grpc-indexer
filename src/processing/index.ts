@@ -1,10 +1,10 @@
-import { SubscribeUpdate, SubscribeUpdateTransactionInfo } from "@triton-one/yellowstone-grpc";
+import { SubscribeRequest, SubscribeUpdate, SubscribeUpdateTransactionInfo } from "@triton-one/yellowstone-grpc";
 import * as bs58 from 'bs58';
 import { db } from "../db";
 
 export class ProcessData {
 
-    private processBuffers(obj: any): any {
+    public processBuffers(obj: any): any {
         if (!obj) return obj;
         
         if (Buffer.isBuffer(obj) || obj instanceof Uint8Array) {
@@ -24,14 +24,32 @@ export class ProcessData {
         return obj;
     }
 
-    async processTransaction(data: SubscribeUpdate) {
+    async processData(data: SubscribeUpdate) {
+      if (data.transaction) {
+        this.processTransaction(data);
+      }
 
-        // Convert buffers to readable format
-        const processedData = this.processBuffers(data);
+      if (data.account) {
+        this.processAccount(data);
+      }
+
+      if (data.slot) {
+        this.processSlot(data);
+      }
+
+      if (data.block) {
+        console.log(`Block update: ${data.block.blockhash}`, {
+          slot: data.block.slot,
+          blockHeight: data.block.blockHeight,
+        });
+      }
+    }
+
+    async processTransaction(data: any) {
 
         if (!data.transaction?.transaction) return;
-        const txnInfo: SubscribeUpdateTransactionInfo = processedData.transaction?.transaction;
-        const slot = BigInt(processedData?.transaction.slot);
+        const txnInfo: SubscribeUpdateTransactionInfo = data.transaction?.transaction;
+        const slot = BigInt(data?.transaction.slot);
         const signature = (txnInfo as any).signature;
         const success = !txnInfo?.meta?.err;
         const fee = txnInfo.meta?.fee ? BigInt(txnInfo.meta?.fee) : null;
@@ -85,4 +103,5 @@ export class ProcessData {
       }
       
     }
+
 }
