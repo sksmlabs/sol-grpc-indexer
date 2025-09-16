@@ -21,10 +21,10 @@ async function clearTopics() {
     .filter(Boolean);
 
   const topics = [
-    process.env.KAFKA_TOPIC_TX    ?? "sol.txs",
-    process.env.KAFKA_TOPIC_ACCT  ?? "sol.accounts",
-    process.env.KAFKA_TOPIC_BLOCK ?? "sol.blocks",
-    process.env.KAFKA_TOPIC_LOGS  ?? "sol.logs",
+    process.env.KAFKA_TOPIC_TX,
+    process.env.KAFKA_TOPIC_ACCT,
+    process.env.KAFKA_TOPIC_BLOCK,
+    process.env.KAFKA_TOPIC_LOGS,
   ];
 
   console.log("⚠️  You are about to delete these topics:", topics);
