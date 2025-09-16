@@ -1,5 +1,18 @@
+#!/usr/bin/env ts-node
 import "dotenv/config";
 import { Kafka } from "kafkajs";
+import readline from "readline";
+
+async function askConfirmation(question: string): Promise<boolean> {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
+      rl.close();
+      const normalized = answer.trim().toLowerCase();
+      resolve(normalized === "y" || normalized === "yes");
+    });
+  });
+}
 
 async function clearTopics() {
   const brokers = (process.env.KAFKA_BROKERS ?? "localhost:9092")
@@ -14,7 +27,14 @@ async function clearTopics() {
     process.env.KAFKA_TOPIC_LOGS  ?? "sol.logs",
   ];
 
-  console.log("Clearing topics with config:", { brokers, topics });
+  console.log("⚠️  You are about to delete these topics:", topics);
+  console.log("Using brokers:", brokers);
+
+  const confirmed = await askConfirmation("Proceed with deletion? (y/n): ");
+  if (!confirmed) {
+    console.log("❌ Aborted by user.");
+    process.exit(0);
+  }
 
   const kafka = new Kafka({
     clientId: process.env.KAFKA_CLIENT_ID ?? "clear-topics",
@@ -24,9 +44,8 @@ async function clearTopics() {
   const admin = kafka.admin();
   await admin.connect();
 
-  // delete
   await admin.deleteTopics({ topics });
-  console.log("Deleted topics:", topics);
+  console.log("✅ Deleted topics:", topics);
 
   await admin.disconnect();
 }
