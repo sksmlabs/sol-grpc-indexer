@@ -2,6 +2,7 @@ import Client, { SubscribeRequest, SubscribeUpdate } from "@triton-one/yellowsto
 import { GRPC_ENDPOINT } from "../config";
 import { Millis } from "../types";
 import { ProcessData } from "../processing";
+import { StreamData } from "../stream";
 
 export enum ClientState {
   Idle = "idle",
@@ -12,6 +13,7 @@ export enum ClientState {
 }
 
 const processor = new ProcessData();
+const stream = new StreamData();
 
 export class YellowStoneClient {
     private client: Client;
@@ -22,11 +24,9 @@ export class YellowStoneClient {
     private maxAttempts: number = 5;
     private state: ClientState = ClientState.Idle;
 
-    
-
     constructor(
         private endpoint: string | undefined = GRPC_ENDPOINT,
-        private onData: (data: any) => void = processor.processData.bind(processor),
+        private onData: (data: any) => void = stream.streamData.bind(stream),
         private onError?: (error: any) => void
     ) {
         if (!this.endpoint) {
@@ -42,7 +42,7 @@ export class YellowStoneClient {
     }
 
     public setOnData(onDataCallback?: (data: any) => void) {
-      this.onData = onDataCallback ?? processor.processData.bind(processor);
+      this.onData = onDataCallback ?? stream.streamData.bind(stream);
     }
 
     public get connectionState(): ClientState {
@@ -129,8 +129,8 @@ export class YellowStoneClient {
     private async handleData(data: SubscribeUpdate): Promise<void> {
         try {
           // Convert buffers to readable format
-          const processedData = processor.processBuffers(data);
-          this.onData(processedData);
+          // const processedData = processor.processBuffers(data);
+          this.onData(data);
         } catch (error) {
           console.error('Error processing update', error);
         }

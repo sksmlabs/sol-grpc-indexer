@@ -18,7 +18,7 @@ async function main(): Promise<void> {
     slot: createSlotSubscription,
     ping: createPingSubscription,
     sol: () => {
-      client.setOnData(processHighValueTransaction);
+      // client.setOnData(processHighValueTransaction);
       return createSolTransferSubscription();
     },
     token: () => {
