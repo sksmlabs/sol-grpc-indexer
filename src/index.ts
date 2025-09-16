@@ -6,10 +6,14 @@ import {
   createTokenSubscription,
   createSolTransferSubscription,
 } from "./grpc/subReqs";
+import { ensureTopics } from "./kafka/admin";
 import { processHighValueTransaction } from "./processing/proHighValTxn";
 
 
 async function main(): Promise<void> {
+  // 1) Make sure topics exist (idempotent)
+  await retry(ensureTopics, { tries: 5, delayMs: 1000 });
+
   const client = new YellowStoneClient();
 
   const [type, token] = [process.argv[2]?.toLowerCase() || "slot", process.argv[3]?.toLowerCase()];
@@ -40,6 +44,15 @@ async function main(): Promise<void> {
 
   client.getVersion();
   await client.connect(factory());
+}
+
+type RetryOpts = { tries: number; delayMs: number };
+async function retry<T>(fn: () => Promise<T>, { tries, delayMs }: RetryOpts): Promise<T> {
+  let lastErr: any;
+  for (let i = 0; i < tries; i++) {
+    try { return await fn(); } catch (e) { lastErr = e; await new Promise(r => setTimeout(r, delayMs)); }
+  }
+  throw lastErr;
 }
 
 main().catch((err) => {

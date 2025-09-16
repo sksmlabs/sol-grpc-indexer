@@ -1,6 +1,8 @@
 import { SubscribeUpdate, SubscribeUpdateTransaction, SubscribeUpdateTransactionInfo } from "@triton-one/yellowstone-grpc";
 import { Transaction } from "@triton-one/yellowstone-grpc/dist/types/grpc/solana-storage";
-import { publish } from "../kafka/producer";
+import { KafkaProducer } from "../kafka/producer";
+
+const producer = new KafkaProducer();
 
 export class StreamData {
 
@@ -9,7 +11,7 @@ export class StreamData {
       if (data.transaction) {
         const tx = this.serializeTx(data);
         console.log('Inside stream', tx)
-        // await publish(process.env.KAFKA_TOPIC_TX!, tx.signature, tx);
+        await producer.publish(process.env.KAFKA_TOPIC_TX!, tx.signature, tx);
       }
     
       // if (u.account) {

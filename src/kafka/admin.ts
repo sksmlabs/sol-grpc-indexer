@@ -10,7 +10,7 @@ const topics = [
     {topic: process.env.KAFKA_TOPIC_TX!, numPartitions: 12, replicationFactor: 1},
     {topic: process.env.KAFKA_TOPIC_ACCT!, numPartitions: 12, replicationFactor: 1},
     {topic: process.env.KAFKA_TOPIC_BLOCK!, numPartitions: 6, replicationFactor: 1},
-    {topic: process.env.KAFKA_TOPIC_LOG!, numPartitions: 12, replicationFactor: 1}
+    {topic: process.env.KAFKA_TOPIC_LOGS!, numPartitions: 12, replicationFactor: 1}
 ]
 
 export async function ensureTopics() {
