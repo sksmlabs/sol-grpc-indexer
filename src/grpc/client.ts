@@ -3,6 +3,8 @@ import { GRPC_ENDPOINT } from "../config";
 import { Millis } from "../types";
 import { ProcessData } from "../processing";
 import { StreamData } from "../stream";
+import { logger } from "../../logs/log";
+import { E } from "../../logs/log-events";
 
 export enum ClientState {
   Idle = "idle",
@@ -54,6 +56,7 @@ export class YellowStoneClient {
     }
 
     async connect(subReq: SubscribeRequest) {
+        logger.info({event: E.YS_CONNECTING}, "Connecting to Yellowstone…");
         // Avoid parallel connects
         if (this.state === ClientState.Connected || this.state === ClientState.Connecting) return;
         

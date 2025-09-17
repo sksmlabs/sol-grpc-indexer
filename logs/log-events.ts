@@ -9,6 +9,10 @@ export const E = {
     // Config / env
     ENV_OK: "ENV_OK",
     ENV_MISSING: "ENV_MISSING",
+    // CLI
+    CLI_VAR_LOADED: "CLI_VAR_LOADED",
+    CLI_USAGE_ERROR: "CLI_USAGE_ERROR",
+    // Yellowstone
     YS_CONNECTING: "YS_CONNECTING",
     YS_CONNECTED: "YS_CONNECTED",
     YS_DISCONNECTED: "YS_DISCONNECTED",
@@ -19,7 +23,6 @@ export const E = {
     KAFKA_ADMIN_TOPIC_EXISTS: "KAFKA_ADMIN_TOPIC_EXISTS",
     KAFKA_CONNECTED: "KAFKA_CONNECTED",
     KAFKA_PUBLISH_FAIL: "KAFKA_PUBLISH_FAIL",
-    STARTUP_READY: "STARTUP_READY",
   } as const;
   export type EventCode = typeof E[keyof typeof E];
   

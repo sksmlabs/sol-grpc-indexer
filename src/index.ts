@@ -7,16 +7,20 @@ import {
   createSolTransferSubscription,
 } from "./grpc/subReqs";
 import { ensureTopics } from "./kafka/admin";
-import { processHighValueTransaction } from "./processing/proHighValTxn";
+import { logger } from "../logs/log";
+import { E } from "../logs/log-events";
 
 
 async function main(): Promise<void> {
+  logger.info({event: E.APP_START, nodeEnv: process.env.NODE_ENV ?? "dev"}, "Startup");
   // 1) Make sure topics exist (idempotent)
   await retry(ensureTopics, { tries: 5, delayMs: 1000 });
 
   const client = new YellowStoneClient();
 
   const [type, token] = [process.argv[2]?.toLowerCase() || "slot", process.argv[3]?.toLowerCase()];
+
+  logger.info({event: E.CLI_VAR_LOADED, mode: type, token }, "Selecting subscription");
 
   const subs: Record<string, () => any> = {
     slot: createSlotSubscription,
@@ -38,12 +42,13 @@ async function main(): Promise<void> {
 
   const factory = subs[type];
   if (!factory) {
-    console.error("Usage: ts-node src/index.ts [slot|ping|token <usdt|usdc|wsol>]");
+    logger.error({event: E.CLI_USAGE_ERROR, got: type}, "Usage: ts-node src/index.ts [slot|ping|sol|token <usdt|usdc|wsol>]");
     process.exit(1);
   }
 
   client.getVersion();
   await client.connect(factory());
+  logger.info({event: E.APP_READY}, "Indexer running");
 }
 
 type RetryOpts = { tries: number; delayMs: number };
