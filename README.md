@@ -18,8 +18,8 @@ A TypeScript-based Solana blockchain indexer that connects to Yellowstone gRPC e
 - 🔧 **Buffer Processing**: Automatic conversion of binary data to readable formats using bs58 encoding
 - 📈 **Transaction Processing**: Extract transaction details including signatures, fees, and account keys
 - 🏗️ **Modular Architecture**: Clean separation of concerns with dedicated modules for gRPC client, processing, and configuration
--. **Kafka Integration**: Topic bootstrap, idempotent creation, and producers
--. **Structured Logging**: Pino-based logs with redaction and pretty output in dev
+- **Kafka Integration**: Topic bootstrap, idempotent creation, and producers
+- **Structured Logging**: Pino-based logs with redaction and pretty output in dev
 
 ## Prerequisites
 
