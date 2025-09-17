@@ -8,16 +8,18 @@
 [![Solana](https://img.shields.io/badge/Solana-9945FF?style=flat&logo=solana&logoColor=white)](https://solana.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A TypeScript-based Solana blockchain indexer that connects to Yellowstone gRPC endpoints to stream and process real-time blockchain data including transactions, accounts, and slot updates.
+A TypeScript-based Solana blockchain indexer that connects to Yellowstone gRPC endpoints to stream and process real-time blockchain data including transactions, accounts, and slot updates. It publishes processed data to Kafka, with structured logging and secure env validation.
 
 ## Features
 
 - 🔄 **Real-time Data Streaming**: Connect to Yellowstone gRPC endpoints for live Solana data
-- 📊 **Multiple Subscription Types**: Support for slot updates, token accounts, and ping subscriptions
+- 📊 **Multiple Subscription Types**: Support for slot updates, SOL transfers, token accounts, and ping subscriptions
 - 🛠️ **TypeScript Support**: Fully typed with comprehensive error handling
 - 🔧 **Buffer Processing**: Automatic conversion of binary data to readable formats using bs58 encoding
 - 📈 **Transaction Processing**: Extract transaction details including signatures, fees, and account keys
 - 🏗️ **Modular Architecture**: Clean separation of concerns with dedicated modules for gRPC client, processing, and configuration
+-. **Kafka Integration**: Topic bootstrap, idempotent creation, and producers
+-. **Structured Logging**: Pino-based logs with redaction and pretty output in dev
 
 ## Prerequisites
 
@@ -63,11 +65,29 @@ npm run dev slot
 npm run dev ping
 ```
 
+- **SOL Transfer Stream**: Stream transactions that include System Program
+```bash
+npm run dev sol
+```
+
 - **Token Account Monitoring**: Monitor specific token accounts
 ```bash
 npm run dev token usdt  # Monitor USDT
 npm run dev token usdc  # Monitor USDC
 npm run dev token wsol  # Monitor Wrapped SOL
+```
+
+### Production build
+```bash
+npm run build
+npm start
+```
+
+### Docker helpers (optional)
+```bash
+npm run docker:up      # start docker-compose stack
+npm run docker:down    # stop
+npm run docker:rebuild # rebuild and start
 ```
 
 ## Configuration
@@ -76,7 +96,11 @@ The indexer supports various configuration options:
 
 - **GRPC_ENDPOINT**: Yellowstone gRPC server endpoint
 - **GRPC_TOKEN**: Authentication token (if required)
+- **LOG_LEVEL**: Logger level (default: debug in dev, info in prod)
+- **NODE_ENV**: Set to `production` to enable JSON logs and disable pretty transport
 - **Supported Tokens**: USDT, USDC, WSOL (easily extensible)
+
+On startup, required env vars are validated and the app exits with a clear error if missing.
 
 ## Data Processing
 
@@ -93,26 +117,44 @@ The indexer processes various types of Solana data:
 - Extracts public keys and account data
 - Handles account state updates
 
-## Error Handling
+## Reliability & Security
 
 - Comprehensive error handling for gRPC connections
-- Automatic reconnection with exponential backoff
-- Graceful handling of malformed data
-- Detailed error logging for debugging
+- Exponential backoff on reconnect attempts
+- Sensitive fields are redacted from logs (tokens, passwords, secrets)
+- Input is normalized (buffers encoded) prior to processing/publishing
+- Graceful exits with non-zero code when unrecoverable
 
 ## Project Structure
 
 ```
 src/
-├── config/          # Configuration management
-├── constants/       # Application constants (token mints, etc.)
-├── grpc/           # gRPC client and subscription management
-│   ├── client.ts   # Main gRPC client implementation
-│   ├── subReqs.ts  # Subscription request builders
-├── processing/     # Data processing and transformation
-│   └── index.ts    # Transaction and account processing
-├── types/          # TypeScript type definitions
-└── index.ts        # Main application entry point
+├── config/           # Env loading, validation, secure config
+├── constants/        # Application constants (token mints, etc.)
+├── grpc/             # gRPC client and subscription management
+│   ├── client.ts     # Main gRPC client implementation
+│   └── subReqs.ts    # Subscription request builders
+├── kafka/            # Kafka admin and producers
+│   ├── admin.ts
+│   └── producer.ts
+├── processing/       # Data processing and transformation
+│   ├── index.ts      # Transaction/account/slot handlers
+│   └── proHighValTxn.ts
+├── stream/           # Stream routing/forwarding
+│   └── index.ts
+├── types/            # TypeScript declarations/utilities
+└── index.ts          # Main application entry point
+
+logs/
+├── log.ts            # Pino logger with redaction & pretty transport in dev
+└── log-events.ts     # Centralized, typed log event names
+```
+
+## Kafka
+
+- Topics are ensured on startup (idempotent). You can manually clear topics:
+```bash
+npm run kafka:clear
 ```
 
 ## License
