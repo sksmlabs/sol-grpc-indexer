@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     /* ---------- File Layout ---------- */
-    "rootDir": "./src",             // where your source TypeScript files live
+    "rootDir": ".",                 // project root contains all TS sources
     "outDir": "./dist",             // where compiled JavaScript should go
 
     /* ---------- Module System ---------- */
@@ -35,6 +35,6 @@
     /* ---------- Performance ---------- */
     "skipLibCheck": true             // skip type-checking d.ts files for faster builds
   },
-  "include": ["src"],                // compile everything in src/
+  "include": ["src", "logs", "scripts"],
   "exclude": ["node_modules", "dist"] // ignore dependencies and build output
 }
