@@ -8,7 +8,7 @@ export class KafkaProducer {
 
   constructor(
     clientId: string = process.env.KAFKA_CLIENT_ID ?? "sol-grpc-indexer",
-    brokers: string[] = (process.env.KAFKA_BROKERS ?? "localhost:9092").split(",")
+    brokers: string[] = (process.env.KAFKA_BROKERS ?? "localhost:29092").split(",")
   ) {
     this.clientId = clientId;
     this.brokers = brokers;
@@ -17,7 +17,7 @@ export class KafkaProducer {
 
   /** Initialize and connect the producer */
   async connect() {
-    if (this.producer) return this.producer;
+    if (this.producer) return;
 
     const kafka = new Kafka({
       clientId: this.clientId,
@@ -33,7 +33,6 @@ export class KafkaProducer {
     });
 
     await this.producer.connect();
-    return this.producer;
   }
 
   /** Publish a single message */
