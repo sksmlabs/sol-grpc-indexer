@@ -7,8 +7,8 @@ import {
   createSolTransferSubscription,
 } from "./grpc/subReqs";
 import { ensureTopics } from "./kafka/admin";
-import { logger } from "../logs/log";
-import { E } from "../logs/log-events";
+import { logger } from "./logs/log";
+import { E } from "./logs/log-events";
 
 
 async function main(): Promise<void> {

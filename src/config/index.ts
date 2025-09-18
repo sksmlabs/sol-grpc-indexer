@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
-import { logger } from "../../logs/log";
-import { E } from "../../logs/log-events";
+import { logger } from "../logs/log";
+import { E } from "../logs/log-events";
 
 dotenv.config();
 

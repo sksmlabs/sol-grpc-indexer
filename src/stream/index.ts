@@ -48,6 +48,7 @@ export class StreamData {
           program_ids: (((tInfo.meta as any)?.loaded_addresses?.writable) ?? []).map((b: any) => b.toString()),
           accounts: (txn.message?.accountKeys ?? []).map((k: any) => Buffer.from(k).toString("hex")),
           ix_count: txn.message?.instructions?.length ?? 0,
+          meta: tInfo.meta
           // commitment: u.commitment ?? "confirmed",
           // raw: tInfo.raw ? Buffer.from(tInfo.raw).toString("base64") : undefined,
         };

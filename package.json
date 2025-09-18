@@ -2,29 +2,27 @@
   "name": "sol-grpc-indexer",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/src/index.js",
     "clean": "rimraf dist",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "kafka:clear": "ts-node scripts/clear-topics.ts",
+    "local:kafka:clear": "ts-node scripts/clear-topics.ts",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f indexer",
-    "docker:rebuild": "docker-compose down && docker-compose build && docker-compose up -d"
+    "docker:app:logs": "docker-compose logs -f app",
+    "docker:rebuild": "docker-compose down && docker-compose build && docker-compose up -d",
+    "docker:kafka:logs": "docker-compose logs -f kafka",
+    "docker:kafka:clear": "docker compose exec app node dist/scripts/clear-topics.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^24.3.1",
-    "dotenv": "^17.2.2",
     "nodemon": "^3.1.10",
-    "pino": "^9.9.5",
-    "pino-pretty": "^13.1.1",
-    "prisma": "^6.16.1",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
@@ -34,6 +32,10 @@
     "@prisma/client": "^6.16.1",
     "@triton-one/yellowstone-grpc": "^4.0.2",
     "bs58": "^6.0.0",
-    "kafkajs": "^2.2.4"
+    "dotenv": "^17.2.2",
+    "kafkajs": "^2.2.4",
+    "pino": "^9.9.5",
+    "pino-pretty": "^13.1.1",
+    "prisma": "^6.16.1"
   }
 }

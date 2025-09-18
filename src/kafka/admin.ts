@@ -1,6 +1,6 @@
 import { Kafka, logLevel } from "kafkajs";
-import { logger } from "../../logs/log";
-import { E } from "../../logs/log-events";
+import { logger } from "../logs/log";
+import { E } from "../logs/log-events";
 
 const kafka = new Kafka({
     clientId: process.env.KAFKA_CLIENT_ID ?? "sol-grpc-index",

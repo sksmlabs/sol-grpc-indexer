@@ -1,10 +1,9 @@
 import Client, { SubscribeRequest, SubscribeUpdate } from "@triton-one/yellowstone-grpc";
 import { GRPC_ENDPOINT } from "../config";
 import { Millis } from "../types";
-import { ProcessData } from "../processing";
 import { StreamData } from "../stream";
-import { logger } from "../../logs/log";
-import { E } from "../../logs/log-events";
+import { logger } from "../logs/log";
+import { E } from "../logs/log-events";
 
 export enum ClientState {
   Idle = "idle",
@@ -14,7 +13,6 @@ export enum ClientState {
   Closed = "closed",
 }
 
-const processor = new ProcessData();
 const stream = new StreamData();
 
 export class YellowStoneClient {

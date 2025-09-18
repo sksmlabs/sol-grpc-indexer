@@ -20,12 +20,12 @@ async function clearTopics() {
     .map(b => b.trim())
     .filter(Boolean);
 
-  const topics = [
+  const topics: string[] = [
     process.env.KAFKA_TOPIC_TX,
     process.env.KAFKA_TOPIC_ACCT,
     process.env.KAFKA_TOPIC_BLOCK,
     process.env.KAFKA_TOPIC_LOGS,
-  ];
+  ].filter((t): t is string => typeof t === "string" && t.trim().length > 0);
 
   console.log("⚠️  You are about to delete these topics:", topics);
   console.log("Using brokers:", brokers);

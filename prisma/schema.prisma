@@ -84,3 +84,13 @@ model Memo {
   
   @@index([content])
 }
+
+model TokenTransfer {
+  id            String      @id @default(cuid())
+  signature     String      @unique
+  tokens        BigInt?
+  fee           BigInt?
+  accounts      String[] // JSON array of account pubkeys
+
+  @@index([signature])
+}
