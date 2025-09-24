@@ -15,7 +15,8 @@
     "docker:app:logs": "docker-compose logs -f app",
     "docker:rebuild": "docker-compose down && docker-compose build && docker-compose up -d",
     "docker:kafka:logs": "docker-compose logs -f kafka",
-    "docker:kafka:clear": "docker compose exec app node dist/scripts/clear-topics.js"
+    "docker:kafka:clear": "docker compose exec app node dist/scripts/clear-topics.js",
+    "docker:kafka:consumer": "docker compose exec app node dist/scripts/run-consumer.js"
   },
   "keywords": [],
   "author": "",

@@ -23,6 +23,7 @@ export const E = {
     KAFKA_ADMIN_TOPIC_EXISTS: "KAFKA_ADMIN_TOPIC_EXISTS",
     KAFKA_CONNECTED: "KAFKA_CONNECTED",
     KAFKA_PUBLISH_FAIL: "KAFKA_PUBLISH_FAIL",
+    KAFKA_CONSUMER_MESSAGES: "KAFKA_CONSUMER_MESSAGES"
   } as const;
   export type EventCode = typeof E[keyof typeof E];
   

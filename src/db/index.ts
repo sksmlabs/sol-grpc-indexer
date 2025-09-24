@@ -7,6 +7,10 @@ class Database {
     constructor() {
         this.client = new PrismaClient();
     }
+
+    async disconnect() {
+        await this.client.$disconnect();
+    }
 }
 
 export const db = new Database();

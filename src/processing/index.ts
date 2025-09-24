@@ -1,6 +1,7 @@
 import { SubscribeRequest, SubscribeUpdate, SubscribeUpdateTransactionInfo } from "@triton-one/yellowstone-grpc";
 import * as bs58 from 'bs58';
 import { db } from "../db";
+import { KafkaConsumer } from "../kafka/consumer";
 
 export class ProcessData {
 
@@ -104,4 +105,53 @@ export class ProcessData {
       
     }
 
+    async processHighValueTransaction(data: any): Promise<void> {
+      if (data.meta) {
+        const preBalances = data.meta.preBalances || [];
+        const postBalances = data.meta.postBalances || [];
+        
+        // Calculate largest balance change
+        let maxChange = 0;
+        preBalances.forEach((preBalance: number, index: number) => {
+          const postBalance = postBalances[index] || 0;
+          const change = Math.abs(postBalance - preBalance);
+          maxChange = Math.max(maxChange, change);
+        });
+        
+        // Only log transactions with > 10 SOL moved
+        const changeInSOL = maxChange / 1e9;
+        if (changeInSOL > 5) {
+          await db.client.tokenTransfer.create(
+            {
+              data: {
+                signature: data.signature,
+                tokens: maxChange,
+                fee: data.meta.fee,
+                accounts: data.accounts
+              }
+            }
+          )
+        } else {
+          console.log("Change in sol is less than 10", changeInSOL);
+        }
+      }
 }
+
+}
+
+(async () => {
+  const manager = new ProcessData();
+  const consumer = new KafkaConsumer();
+
+  await consumer.subscribe({
+    topic: process.env.KAFKA_TOPIC_TX ?? "tx-stream",
+    groupId: process.env.KAFKA_GROUP_ID ?? "high-value-group",
+    handler: manager.processHighValueTransaction,
+  });
+
+  process.on("SIGINT", async () => {
+    await consumer.stopAll();
+    db.disconnect();
+    process.exit(0);
+  });
+})();

@@ -16,8 +16,8 @@ export class KafkaProducer {
   }
 
   /** Initialize and connect the producer */
-  async connect() {
-    if (this.producer) return;
+  async connect(): Promise<Producer> {
+    if (this.producer) return this.producer;
 
     const kafka = new Kafka({
       clientId: this.clientId,
@@ -33,6 +33,7 @@ export class KafkaProducer {
     });
 
     await this.producer.connect();
+    return this.producer;
   }
 
   /** Publish a single message */
