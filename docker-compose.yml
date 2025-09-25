@@ -46,14 +46,24 @@ services:
     depends_on:
       kafka:
         condition: service_started      # Bitnami image has no robust healthcheck
-    ports:
-      - "3000:3000"
     networks: [knet]
     # Dev hot-reload? uncomment:
     # volumes:
     #   - ./:/app
     #   - /app/node_modules
     # command: ["npx","ts-node-dev","--respawn","--transpileOnly","src/index.ts"]
+
+  producer-sol:
+    extends: { service: app }
+    environment:
+      MODE: "sol"
+    command: ["node","dist/src/workers/producer.js"]
+    restart: unless-stopped
+
+  consumer:
+    extends: { service: app }
+    command: ["node","dist/src/workers/consumer.js"]
+    restart: unless-stopped
 
 networks:
   knet:

@@ -1,8 +1,8 @@
 // ---- bootstrap runner (single file script use) ----
 import { SubscribeUpdate } from "@triton-one/yellowstone-grpc";
-import { KafkaConsumer } from "../src/kafka/consumer";
-import { ProcessData } from "../src/processing";
-import { db } from "../src/db";
+import { KafkaConsumer } from "../kafka/consumer";
+import { ProcessData } from "../processing";
+import { db } from "../db";
 
 (async () => {
   const manager = new ProcessData();
