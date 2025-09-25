@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     /* ---------- File Layout ---------- */
-    "rootDir": ".",                 // project root contains all TS sources
-    "outDir": "dist",             // where compiled JavaScript should go
+    "rootDir": "./src",                 // project root contains all TS sources
+    "outDir": "./dist",             // where compiled JavaScript should go
 
     /* ---------- Module System ---------- */
     "module": "commonjs",           // use CommonJS (no .js extension required in imports)
@@ -35,6 +35,6 @@
     /* ---------- Performance ---------- */
     "skipLibCheck": true             // skip type-checking d.ts files for faster builds
   },
-  "include": ["src", "src/logs", "scripts"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"] // ignore dependencies and build output
 }

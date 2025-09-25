@@ -6,7 +6,12 @@ services:
     image: bitnami/kafka:latest
     container_name: kafka
     ports:
-      - "9092:9092"   # host access
+      - "9092:9092"
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh", "--bootstrap-server", "localhost:29092", "--list"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     environment:
       - KAFKA_ENABLE_KRAFT=yes
       - KAFKA_CFG_NODE_ID=1
@@ -30,39 +35,58 @@ services:
       - "8080:8080"
     environment:
       - KAFKA_CLUSTERS_0_NAME=local
-      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:29092  # internal listener
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:29092
     depends_on:
       - kafka
     networks: [knet]
 
   # =========================
-  # Your TypeScript app
+  # Indexer app (monorepo: apps/indexer-server)
   # =========================
-  app:
+  indexer:
+    container_name: indexer
     build:
       context: .
-      dockerfile: Dockerfile        # or Dockerfile.dev for hot reload
-    env_file: .env
+      dockerfile: Dockerfile
+      args:
+        APP_PATH: ./apps/indexer-server
+    env_file: ./apps/indexer-server/.env
+    environment:
+      # Make sure your code reads this:
+      - KAFKA_BROKERS=kafka:29092
+      - NODE_ENV=production
+      # If you use Prisma:
+      # - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/sol
+      # Yellowstone etc.:
+      # - GRPC_ENDPOINT=${GRPC_ENDPOINT}
     depends_on:
       kafka:
-        condition: service_started      # Bitnami image has no robust healthcheck
+        condition: service_healthy
     networks: [knet]
-    # Dev hot-reload? uncomment:
+    # Dev hot-reload (optional):
     # volumes:
-    #   - ./:/app
+    #   - ./apps/indexer-server:/app
     #   - /app/node_modules
-    # command: ["npx","ts-node-dev","--respawn","--transpileOnly","src/index.ts"]
 
+  # Workers/commands using the same image
   producer-sol:
-    extends: { service: app }
+    extends: { service: indexer }
+    container_name: producer-sol
     environment:
       MODE: "sol"
-    command: ["node","dist/src/workers/producer.js"]
+    command: ["node","dist/workers/producer.js"]
+    depends_on:
+      kafka:
+        condition: service_healthy
     restart: unless-stopped
 
   consumer:
-    extends: { service: app }
-    command: ["node","dist/src/workers/consumer.js"]
+    extends: { service: indexer }
+    container_name: consumer
+    command: ["node","dist/workers/consumer.js"]
+    depends_on:
+      kafka:
+        condition: service_healthy
     restart: unless-stopped
 
 networks:

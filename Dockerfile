@@ -3,18 +3,25 @@
     RUN apk add --no-cache openssl libc6-compat
     WORKDIR /app
     
-    COPY package*.json ./
+    # Allow passing app path
+    ARG APP_PATH
+    
+    # Copy package manifests and install deps
+    COPY ${APP_PATH}/package*.json ./
     RUN npm ci
     
-    # Generate Prisma client in build stage
+    # Copy Prisma schema from repo root (adjust if lives elsewhere)
     COPY prisma ./prisma
+    
+    # Generate Prisma client (outputs to node_modules/.prisma + @prisma/client)
     RUN npx prisma generate
     
-    COPY tsconfig.json ./
-    COPY src ./src
-    COPY scripts ./scripts
+    # Copy app sources
+    COPY ${APP_PATH}/tsconfig.json ./
+    COPY ${APP_PATH}/src ./src
+    COPY ${APP_PATH}/scripts ./scripts
     
-    # Compile TS -> dist
+    # Compile TypeScript -> dist
     RUN npm run build
     
     # ---- Runner ----
@@ -22,19 +29,18 @@
     RUN apk add --no-cache openssl libc6-compat
     WORKDIR /app
     
-    # Install only prod deps
-    COPY package*.json ./
+    ARG APP_PATH
+    COPY ${APP_PATH}/package*.json ./
     RUN npm ci --omit=dev
     
-    # Bring compiled code and generated Prisma client from builder
+    # Copy build output + Prisma client from builder
     COPY --from=builder /app/dist ./dist
     COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
     COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
     
-    # If you read files from ./prisma at runtime (usually not), copy it too:
-    # COPY --from=builder /app/prisma ./prisma
-    
     ENV NODE_ENV=production
     EXPOSE 3000
+    
+    # Adjust entrypoint to your actual build output
     CMD ["node", "dist/src/index.js"]
     
