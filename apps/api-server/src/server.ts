@@ -42,6 +42,35 @@ await app.register(rateLimit, {
 })
 
 // --- AUTH PREHANDLERS
+// 1) Shared secret (header) guard
+function requireApiSecret(req: any, reply: any, done: any) {
+    const incoming = req.headers["x-api-key"];
+    if (incoming ! == "API_SECRET") {
+        reply.unathorized("Invalid or missing x-api-key");
+        return;
+    }
+    done();
+}
+
+// 2) JWT guard
+async function requireJwt(req: any, reply: any) {
+    try {
+        await req.jwtVerify();
+    } catch {
+        return reply.unathorized("Invalid or missing Bearer token");
+    }
+}
+
+// 3) Flexible guard (accept either API secret OR JWT)
+async function requireSecretOrJwt(req: any, reply: any) {
+    const hasSecret = req.headers["x-api-key"] === API_SECRET;
+    if (hasSecret) return; // short circuit
+    try {
+        await req.jwtVerify();
+    } catch {
+        return reply.unathorized("Provide x-api-key or a valid Bearer token");
+    }
+}
 
 // --- ROUTE
 app.get('/', async function handler(request, reply) {
