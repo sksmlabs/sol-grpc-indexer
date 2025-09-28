@@ -89,6 +89,50 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  # =========================
+  # API server (monorepo: apps/api-server)
+  # =========================
+  api:
+    container_name: api
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_PATH: ./apps/api-server
+    env_file: ./apps/api-server/.env
+    environment:
+      # App basics
+      - NODE_ENV=production
+      - PORT=3000
+      # Auth
+      - API_SECRET=${API_SECRET:-change_me_api_secret}
+      - JWT_SECRET=${JWT_SECRET:-change_me_jwt_secret}
+      # Rate limit (Redis)
+      - REDIS_URL=redis://redis:6379
+      # If your API reads Kafka:
+      - KAFKA_BROKERS=kafka:29092
+      # If you need CORS:
+      - CORS_ORIGIN=*
+    ports:
+      - "3000:3000"
+    depends_on:
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/healthz || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    networks: [knet]
+    restart: unless-stopped
+    # volumes (dev hot-reload example):
+    # volumes:
+    #   - ./apps/api-server:/app
+    #   - /app/node_modules
+    # command: ["npm","run","dev"]
+
 networks:
   knet:
 
